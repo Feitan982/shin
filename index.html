@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For My Love 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating hearts background (populated by JS) -->
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <!-- ===== LOGIN SCREEN ===== -->
+  <div class="login-shell" id="loginShell">
+    <form class="login-card" id="loginForm" novalidate>
+      <div class="brand-badge">💌</div>
+      <h2>Hi, my love</h2>
+      <p class="login-subtitle">Enter our special date to unlock your surprise.</p>
+
+      <label class="input-group">
+        <span>Our Monthsary 🔑</span>
+        <input type="text" id="password" placeholder="MM-DD-YY" required autocomplete="off">
+      </label>
+
+      <button type="submit">Open My Surprise 💖</button>
+
+      <div class="hint-text">💡 Hint: the day we became us</div>
+      <p id="loginFeedback" class="login-feedback" aria-live="polite"></p>
+    </form>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="container content-shell hidden" id="contentShell">
+    <!-- HERO -->
+    <div class="hero">
+      <h1>For My Girl 💖</h1>
+      <p>a little surprise, made with love <span class="heart-icon">💘</span></p>
+    </div>
+
+    <!-- EDIT MODE TOGGLE -->
+    <div class="edit-toggle-bar">
+      <button id="toggleEditMode" class="edit-toggle-btn">
+        ✏️ Enable Edit Mode
+      </button>
+      <span class="edit-status" id="editStatus">Viewing only</span>
+    </div>
+
+    <!-- NOTES SECTION (TABLE) -->
+    <section>
+      <div class="section-title">
+        <span>📝</span> Love Notes
+      </div>
+
+      <!-- Add Note Form (hidden in view mode) -->
+      <form class="add-form hidden" id="addNoteForm">
+        <div class="add-form-row">
+          <input type="text" id="noteText" placeholder="Write a sweet note..." required maxlength="300">
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="noteFrom" placeholder="From (e.g. — your boy)" maxlength="60">
+          <button type="submit" class="add-btn">➕ Add Note</button>
+        </div>
+      </form>
+
+      <div class="table-wrapper">
+        <table class="love-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Message</th>
+              <th>From</th>
+              <th class="action-col hidden">Action</th>
+            </tr>
+          </thead>
+          <tbody id="notesTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PHOTO GALLERY (TABLE) -->
+    <section>
+      <div class="section-title">
+        <span>📸</span> Our Moments
+      </div>
+
+      <!-- Add Photo Form -->
+      <form class="add-form hidden" id="addPhotoForm">
+        <div class="add-form-row">
+          <input type="url" id="photoSrc" placeholder="Image URL (https://...)" required>
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="photoCaption" placeholder="Caption (e.g. our first date)" required maxlength="80">
+          <button type="submit" class="add-btn">➕ Add Photo</button>
+        </div>
+      </form>
+
+      <div class="table-wrapper">
+        <table class="love-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Photo</th>
+              <th>Caption</th>
+              <th class="action-col hidden">Action</th>
+            </tr>
+          </thead>
+          <tbody id="photosTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIDEO SECTION (TABLE) -->
+    <section>
+      <div class="section-title">
+        <span>🎬</span> Little Videos
+      </div>
+
+      <!-- Add Video Form -->
+      <form class="add-form hidden" id="addVideoForm">
+        <div class="add-form-row">
+          <input type="url" id="videoSrc" placeholder="Video URL (mp4)" required>
+        </div>
+        <div class="add-form-row">
+          <input type="url" id="videoPoster" placeholder="Poster image URL (optional)">
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="videoNote" placeholder="Short note (e.g. our silly dance)" required maxlength="60">
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="videoDesc" placeholder="Description" required maxlength="120">
+          <button type="submit" class="add-btn">➕ Add Video</button>
+        </div>
+      </form>
+
+      <div class="table-wrapper">
+        <table class="love-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Video</th>
+              <th>Note</th>
+              <th>Description</th>
+              <th class="action-col hidden">Action</th>
+            </tr>
+          </thead>
+          <tbody id="videosTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MEMORIES SECTION -->
+    <section>
+      <div class="section-title">
+        <span>🧸</span> Precious Memories
+      </div>
+
+      <!-- Add Memory Form -->
+      <form class="add-form hidden" id="addMemoryForm">
+        <div class="add-form-row">
+          <input type="text" id="memoryText" placeholder="Describe the memory..." required maxlength="250">
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="memoryDate" placeholder="Date (e.g. October 14)" required maxlength="40">
+          <button type="submit" class="add-btn">➕ Add Memory</button>
+        </div>
+      </form>
+
+      <div class="memories-list" id="memoriesList"></div>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      I love you, always & forever
+      <small>made with ❤️ just for you</small>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyC2GxMbFFao-pmAglaG4Nrr1B6JwdH2A5s',
+      authDomain: 'shin-c63a8.firebaseapp.com',
+      projectId: 'shin-c63a8',
+      storageBucket: 'shin-c63a8.firebasestorage.app',
+      messagingSenderId: '488114449913',
+      appId: '1:488114449913:web:dc25616a618490ae596128',
+      measurementId: 'G-HZH6N84SBQ'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    window.firebaseApp = app;
+    window.firebaseAnalytics = analytics;
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
