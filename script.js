@@ -12,6 +12,13 @@ const emptyMessages = {
 	memories: 'No memories yet. Start with a favorite story.'
 };
 
+/* ============================================================
+   RELATIONSHIP TIMER
+   Change RELATIONSHIP_START to your real start date.
+   Format: 'YYYY-MM-DDTHH:MM:SS'
+   ============================================================ */
+const RELATIONSHIP_START = new Date('2026-10-04T00:00:00');
+
 function loadEntries(kind) {
 	try {
 		const entries = JSON.parse(localStorage.getItem(collectionKeys[kind]) || '[]');
@@ -152,7 +159,7 @@ function renderCollection(kind) {
 
 		// ---- All other kinds: original card layout ----
 		const heading = makeElement('div', 'entry-card-heading');
-		const cardTitle = kind === 'memories' ? (entry.date || 'A sweet memory') : entry.caption;
+		const cardTitle = kind === 'memories' ? 'A sweet memory' : entry.caption;
 		const title = makeElement('h3', '', cardTitle);
 		heading.append(title, removeButton);
 		card.append(heading);
@@ -171,7 +178,7 @@ function renderCollection(kind) {
 			card.insertBefore(video, heading);
 		} else {
 			card.append(makeElement('p', 'entry-copy', entry.text));
-			if (entry.date) card.append(makeElement('p', 'entry-byline', entry.date));
+			if (entry.date) card.append(makeElement('p', 'entry-byline', kind === 'memories' ? formatMemoryDate(entry.date) : entry.date));
 		}
 		container.append(card);
 	});
@@ -210,6 +217,91 @@ function selectTab(kind) {
 	});
 }
 
+/* ============================================================
+   TOGETHER TIMER LOGIC
+   ============================================================ */
+function setupTogetherTimer() {
+	const els = {
+		title: document.getElementById('togetherTitle'),
+		subline: document.getElementById('togetherSubline'),
+		years: document.getElementById('timeYears'),
+		months: document.getElementById('timeMonths'),
+		days: document.getElementById('timeDays'),
+		hours: document.getElementById('timeHours'),
+		minutes: document.getElementById('timeMinutes'),
+		seconds: document.getElementById('timeSeconds'),
+		since: document.getElementById('togetherSince')
+	};
+
+	if (!els.title || !els.years) return;
+
+	const pad = (n) => String(n).padStart(2, '0');
+
+	function calendarDiff(from, to) {
+		let years = to.getFullYear() - from.getFullYear();
+		let months = to.getMonth() - from.getMonth();
+		let days = to.getDate() - from.getDate();
+
+		if (days < 0) {
+			months -= 1;
+			const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0).getDate();
+			days += prevMonth;
+		}
+		if (months < 0) {
+			years -= 1;
+			months += 12;
+		}
+		return { years, months, days };
+	}
+
+	function tick() {
+		const now = new Date();
+		const diff = now - RELATIONSHIP_START;
+
+		if (diff < 0) {
+			// Countdown-to-start state (start date is in the future)
+			const remaining = RELATIONSHIP_START - now;
+			const totalSec = Math.floor(remaining / 1000);
+			const d = Math.floor(totalSec / 86400);
+			const h = Math.floor((totalSec % 86400) / 3600);
+			const m = Math.floor((totalSec % 3600) / 60);
+			const s = totalSec % 60;
+
+			els.title.textContent = 'Counting down to the beginning…';
+			els.subline.textContent = 'Every second brings us closer.';
+			els.years.textContent = pad(Math.floor(d / 365));
+			els.months.textContent = pad(Math.floor((d % 365) / 30));
+			els.days.textContent = pad(d % 30);
+			els.hours.textContent = pad(h);
+			els.minutes.textContent = pad(m);
+			els.seconds.textContent = pad(s);
+		} else {
+			// Together-for state
+			const { years, months, days } = calendarDiff(RELATIONSHIP_START, now);
+			const h = now.getHours();
+			const m = now.getMinutes();
+			const s = now.getSeconds();
+
+			els.title.textContent = 'Together for';
+			els.subline.textContent = 'And every second still feels like the first.';
+			els.years.textContent = String(years);
+			els.months.textContent = String(months);
+			els.days.textContent = String(days);
+			els.hours.textContent = pad(h);
+			els.minutes.textContent = pad(m);
+			els.seconds.textContent = pad(s);
+		}
+
+		els.since.textContent = 'Since October 4, 2026';
+	}
+
+	tick();
+	window.setInterval(tick, 1000);
+}
+
+/* ============================================================
+   ACCESS / LOGIN
+   ============================================================ */
 function setupCodeForm() {
 	const inputs = [...document.querySelectorAll('.code-box')];
 	const message = document.getElementById('codeMessage');
@@ -269,6 +361,9 @@ function setupBackButton() {
 	});
 }
 
+/* ============================================================
+   NOTE DIALOG
+   ============================================================ */
 function openNote(index) {
 	const note = collections.notes[index];
 	if (!note) return;
@@ -335,6 +430,9 @@ function setupNoteDialog() {
 	});
 }
 
+/* ============================================================
+   COLLECTIONS
+   ============================================================ */
 function safeMediaUrl(value) {
 	try {
 		const url = new URL(value);
@@ -342,6 +440,12 @@ function safeMediaUrl(value) {
 	} catch {
 		return '';
 	}
+}
+
+function formatMemoryDate(value) {
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return value;
+	const date = new Date(`${value}T00:00:00`);
+	return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(date);
 }
 
 function setupCollections() {
@@ -444,7 +548,11 @@ function renderAllCollections() {
 	Object.keys(collectionKeys).forEach(renderCollection);
 }
 
+/* ============================================================
+   BOOT
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
+	setupTogetherTimer();
 	setupCodeForm();
 	setupProceedButton();
 	setupBackButton();

@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="theme-color" content="#0d1020">
-	<title>A Birthday Surprise</title>
+	<title>letter</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Serif+Display&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -65,14 +65,29 @@
 		<section class="screen keepsake-screen hidden" id="keepsakeScreen" aria-label="Birthday keepsakes">
 			<header class="site-header">
 				<a class="site-mark" href="#top" aria-label="Birthday keepsakes home"><span>♡</span> for you</a>
-				<nav class="top-tabs" aria-label="Keepsake categories" role="tablist">
-					<button type="button" class="tab-button active" id="tab-notes" role="tab" aria-selected="true" aria-controls="panel-notes" data-view="notes"><span aria-hidden="true">✉</span> Notes</button>
-					<button type="button" class="tab-button" id="tab-pictures" role="tab" aria-selected="false" aria-controls="panel-pictures" data-view="pictures"><span aria-hidden="true">▧</span> Pictures</button>
-					<button type="button" class="tab-button" id="tab-videos" role="tab" aria-selected="false" aria-controls="panel-videos" data-view="videos"><span aria-hidden="true">▷</span> Videos</button>
-					<button type="button" class="tab-button" id="tab-memories" role="tab" aria-selected="false" aria-controls="panel-memories" data-view="memories"><span aria-hidden="true">✧</span> Memories</button>
-				</nav>
 				<button class="back-button" id="backButton" type="button"><span aria-hidden="true">←</span> Back to code</button>
 			</header>
+
+			<section class="together-hero" aria-label="Time together">
+				<p class="together-eyebrow">Our story in numbers</p>
+				<h2 class="together-title" id="togetherTitle">Together for</h2>
+				<p class="together-subline" id="togetherSubline"></p>
+				<div class="time-grid" id="timeGrid">
+					<div class="time-cell"><span class="time-value" id="timeYears">0</span><span class="time-label">Years</span></div>
+					<div class="time-cell"><span class="time-value" id="timeMonths">0</span><span class="time-label">Months</span></div>
+					<div class="time-cell"><span class="time-value" id="timeDays">0</span><span class="time-label">Days</span></div>
+					<div class="time-cell"><span class="time-value" id="timeHours">0</span><span class="time-label">Hours</span></div>
+					<div class="time-cell"><span class="time-value" id="timeMinutes">0</span><span class="time-label">Minutes</span></div>
+					<div class="time-cell"><span class="time-value" id="timeSeconds">0</span><span class="time-label">Seconds</span></div>
+				</div>
+				<p class="together-since" id="togetherSince"></p>
+			</section>
+			<nav class="top-tabs" aria-label="Keepsake categories" role="tablist">
+				<button type="button" class="tab-button active" id="tab-notes" role="tab" aria-selected="true" aria-controls="panel-notes" data-view="notes"><span aria-hidden="true">✉</span> Notes</button>
+				<button type="button" class="tab-button" id="tab-pictures" role="tab" aria-selected="false" aria-controls="panel-pictures" data-view="pictures"><span aria-hidden="true">▧</span> Pictures</button>
+				<button type="button" class="tab-button" id="tab-videos" role="tab" aria-selected="false" aria-controls="panel-videos" data-view="videos"><span aria-hidden="true">▷</span> Videos</button>
+				<button type="button" class="tab-button" id="tab-memories" role="tab" aria-selected="false" aria-controls="panel-memories" data-view="memories"><span aria-hidden="true">✧</span> Memories</button>
+			</nav>
 
 			<div class="keepsake-content" id="top">
 				<div class="welcome-banner">
@@ -115,7 +130,7 @@
 					<div class="panel-heading"><div><span class="panel-kicker">Tiny things, treasured forever</span><h2>Sweet memories</h2></div><button class="add-button" type="button" data-add="memoryForm">＋ Add a memory</button></div>
 					<form class="entry-form hidden" id="memoryForm" data-kind="memories">
 						<label for="memoryText">Tell the story</label><textarea id="memoryText" name="text" rows="3" maxlength="500" placeholder="What do you want to remember?" required></textarea>
-						<div class="form-row"><label for="memoryDate">When <input id="memoryDate" name="date" maxlength="60" placeholder="A date or season"></label><button class="primary-button small-button" type="submit">Save memory</button></div>
+						<div class="form-row"><label for="memoryDate">Event date <input id="memoryDate" name="date" type="date"></label><button class="primary-button small-button" type="submit">Save memory</button></div>
 					</form>
 					<div class="entry-grid memory-grid" id="memoriesList"></div>
 				</section>
