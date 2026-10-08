@@ -1,204 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>For My Love 💕</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#0d1020">
+	<title>A Birthday Surprise</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Serif+Display&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
+	<div class="gingham" aria-hidden="true"></div>
+	<div class="floating-heart heart-one" aria-hidden="true">✦</div>
+	<div class="floating-heart heart-two" aria-hidden="true">✧</div>
 
-  <!-- Floating hearts background (populated by JS) -->
-  <div class="hearts-bg" id="heartsBg"></div>
+	<main>
+		<section class="screen access-screen" id="accessScreen" aria-labelledby="accessTitle">
+			<div class="access-layout">
+				<div class="access-message">
+					<p class="message-eyebrow"><span aria-hidden="true">✦</span> A little note beneath the stars</p>
+					<h1>In every universe,<br><em>I’d find you.</em></h1>
+					<p class="love-message"><span>You make ordinary days feel like magic.</span><span>Tonight, this little universe is yours.</span></p>
+					<div class="message-constellation" aria-hidden="true">
+						<span class="constellation-star star-a">✦</span>
+						<span class="constellation-star star-b">·</span>
+						<span class="constellation-star star-c">✧</span>
+						<span class="constellation-star star-d">·</span>
+						<span class="constellation-line"></span>
+						<span class="constellation-note">made of stardust &amp; love</span>
+					</div>
+					<p class="message-signoff">Always, <span>your favorite person</span></p>
+				</div>
 
-  <!-- ===== LOGIN SCREEN ===== -->
-  <div class="login-shell" id="loginShell">
-    <form class="login-card" id="loginForm" novalidate>
-      <div class="brand-badge">💌</div>
-      <h2>Hi, my love</h2>
-      <p class="login-subtitle">Enter our special date to unlock your surprise.</p>
+				<div class="gate-card">
+					<div class="top-label"><span class="label-star">✦</span> A birthday surprise <span class="label-star">✦</span></div>
+					<h2 id="accessTitle">Enter Code</h2>
+					<p class="screen-copy">A little date, just between us.</p>
+					<div class="celestial-orbit" aria-hidden="true">
+						<span class="orbit orbit-one"></span>
+						<span class="orbit orbit-two"></span>
+						<span class="orbit-core">♡</span>
+						<span class="orbit-spark spark-one">✦</span>
+						<span class="orbit-spark spark-two">✧</span>
+					</div>
+					<form id="codeForm" class="code-form">
+<div class="code-inputs" aria-label="Six digit access code">
+    <input class="code-box" aria-label="First digit" inputmode="numeric" autocomplete="one-time-code" maxlength="1" required>
+    <input class="code-box" aria-label="Second digit" inputmode="numeric" maxlength="1" required>
+    <input class="code-box" aria-label="Third digit" inputmode="numeric" maxlength="1" required>
+    <input class="code-box" aria-label="Fourth digit" inputmode="numeric" maxlength="1" required>
+    <input class="code-box" aria-label="Fifth digit" inputmode="numeric" maxlength="1" required>
+    <input class="code-box" aria-label="Sixth digit" inputmode="numeric" maxlength="1" required>
+</div>
+						<p class="hint">Psst... it’s a special month and day.</p>
+						<button class="primary-button" type="submit">Unlock your surprise <span aria-hidden="true">↗</span></button>
+						<p class="form-message" id="codeMessage" aria-live="polite"></p>
+					</form>
+					<p class="card-footnote">A small surprise, kept close to the heart.</p>
+				</div>
+			</div>
+		</section>
 
-      <label class="input-group">
-        <span>Our Monthsary 🔑</span>
-        <input type="text" id="password" placeholder="MM-DD-YY" required autocomplete="off">
-      </label>
+		<section class="screen keepsake-screen hidden" id="keepsakeScreen" aria-label="Birthday keepsakes">
+			<header class="site-header">
+				<a class="site-mark" href="#top" aria-label="Birthday keepsakes home"><span>♡</span> for you</a>
+				<nav class="top-tabs" aria-label="Keepsake categories" role="tablist">
+					<button type="button" class="tab-button active" id="tab-notes" role="tab" aria-selected="true" aria-controls="panel-notes" data-view="notes"><span aria-hidden="true">✉</span> Notes</button>
+					<button type="button" class="tab-button" id="tab-pictures" role="tab" aria-selected="false" aria-controls="panel-pictures" data-view="pictures"><span aria-hidden="true">▧</span> Pictures</button>
+					<button type="button" class="tab-button" id="tab-videos" role="tab" aria-selected="false" aria-controls="panel-videos" data-view="videos"><span aria-hidden="true">▷</span> Videos</button>
+					<button type="button" class="tab-button" id="tab-memories" role="tab" aria-selected="false" aria-controls="panel-memories" data-view="memories"><span aria-hidden="true">✧</span> Memories</button>
+				</nav>
+				<button class="back-button" id="backButton" type="button"><span aria-hidden="true">←</span> Back to code</button>
+			</header>
 
-      <button type="submit">Open My Surprise 💖</button>
+			<div class="keepsake-content" id="top">
+				<div class="welcome-banner">
+					<span class="welcome-eyebrow">A little collection of us</span>
+					<h1>Happy Birthday, My Love</h1>
+					<p>Keep all your favorite little moments in one place.</p>
+					<span class="banner-flower" aria-hidden="true">✿</span>
+				</div>
 
-      <div class="hint-text">💡 Hint: the day we became us</div>
-      <p id="loginFeedback" class="login-feedback" aria-live="polite"></p>
-    </form>
-  </div>
+				<section class="collection-panel" id="panel-notes" role="tabpanel" aria-labelledby="tab-notes" data-panel="notes">
+					<div class="panel-heading"><div><span class="panel-kicker">A few words from the heart</span><h2>Little love notes</h2></div><button class="add-button" type="button" data-add="noteForm">＋ Add a note</button></div>
+					<form class="entry-form hidden" id="noteForm" data-kind="notes">
+						<label for="noteText">Your note</label><textarea id="noteText" name="text" rows="3" maxlength="500" placeholder="Write something lovely..." required></textarea>
+						<div class="form-row"><label for="noteFrom">From <input id="noteFrom" name="from" maxlength="60" placeholder="Your favorite person"></label><button class="primary-button small-button" type="submit">Save note</button></div>
+					</form>
+<div class="entry-grid note-grid accordion" id="notesList"></div>
+				</section>
 
-  <!-- ===== MAIN CONTENT ===== -->
-  <div class="container content-shell hidden" id="contentShell">
-    <!-- HERO -->
-    <div class="hero">
-      <h1>For My Girl 💖</h1>
-      <p>a little surprise, made with love <span class="heart-icon">💘</span></p>
-    </div>
+				<section class="collection-panel hidden" id="panel-pictures" role="tabpanel" aria-labelledby="tab-pictures" data-panel="pictures" hidden>
+					<div class="panel-heading"><div><span class="panel-kicker">The moments you want to keep</span><h2>Favorite pictures</h2></div><button class="add-button" type="button" data-add="pictureForm">＋ Add a picture</button></div>
+					<form class="entry-form hidden" id="pictureForm" data-kind="pictures">
+						<label for="pictureFiles">Choose pictures from your device</label>
+						<input id="pictureFiles" name="files" type="file" accept="image/*" multiple required>
+						<p class="upload-hint">You can select several at once. Pictures are resized to save space.</p>
+						<div class="form-row"><label for="pictureCaption">Shared caption (optional) <input id="pictureCaption" name="caption" maxlength="100" placeholder="A favorite day together"></label><button class="primary-button small-button" type="submit">Upload pictures</button></div>
+					</form>
+					<div class="entry-grid picture-grid" id="picturesList"></div>
+				</section>
 
-    <!-- EDIT MODE TOGGLE -->
-    <div class="edit-toggle-bar">
-      <button id="toggleEditMode" class="edit-toggle-btn">
-        ✏️ Enable Edit Mode
-      </button>
-      <span class="edit-status" id="editStatus">Viewing only</span>
-    </div>
+				<section class="collection-panel hidden" id="panel-videos" role="tabpanel" aria-labelledby="tab-videos" data-panel="videos" hidden>
+					<div class="panel-heading"><div><span class="panel-kicker">Little clips, big feelings</span><h2>Our videos</h2></div><button class="add-button" type="button" data-add="videoForm">＋ Add a video</button></div>
+					<form class="entry-form hidden" id="videoForm" data-kind="videos">
+						<label for="videoUrl">Video URL</label><input id="videoUrl" name="url" type="url" placeholder="https://...mp4" required>
+						<div class="form-row"><label for="videoCaption">A little title <input id="videoCaption" name="caption" maxlength="100" placeholder="That silly little dance" required></label><button class="primary-button small-button" type="submit">Save video</button></div>
+					</form>
+					<div class="entry-grid video-grid" id="videosList"></div>
+				</section>
 
-    <!-- NOTES SECTION (TABLE) -->
-    <section>
-      <div class="section-title">
-        <span>📝</span> Love Notes
-      </div>
+				<section class="collection-panel hidden" id="panel-memories" role="tabpanel" aria-labelledby="tab-memories" data-panel="memories" hidden>
+					<div class="panel-heading"><div><span class="panel-kicker">Tiny things, treasured forever</span><h2>Sweet memories</h2></div><button class="add-button" type="button" data-add="memoryForm">＋ Add a memory</button></div>
+					<form class="entry-form hidden" id="memoryForm" data-kind="memories">
+						<label for="memoryText">Tell the story</label><textarea id="memoryText" name="text" rows="3" maxlength="500" placeholder="What do you want to remember?" required></textarea>
+						<div class="form-row"><label for="memoryDate">When <input id="memoryDate" name="date" maxlength="60" placeholder="A date or season"></label><button class="primary-button small-button" type="submit">Save memory</button></div>
+					</form>
+					<div class="entry-grid memory-grid" id="memoriesList"></div>
+				</section>
+				<footer class="site-footer">Made with a whole lot of love <span aria-hidden="true">♡</span></footer>
+			</div>
+		</section>
 
-      <!-- Add Note Form (hidden in view mode) -->
-      <form class="add-form hidden" id="addNoteForm">
-        <div class="add-form-row">
-          <input type="text" id="noteText" placeholder="Write a sweet note..." required maxlength="300">
-        </div>
-        <div class="add-form-row">
-          <input type="text" id="noteFrom" placeholder="From (e.g. — your boy)" maxlength="60">
-          <button type="submit" class="add-btn">➕ Add Note</button>
-        </div>
-      </form>
+		<dialog class="note-dialog" id="noteDialog" aria-labelledby="noteDialogTitle">
+			<div class="note-dialog-header">
+				<div class="note-dialog-actions">
+					<button class="dialog-edit-button" id="editNoteButton" type="button">Edit</button>
+					<button class="dialog-close-button" id="closeNoteButton" type="button" aria-label="Close note">×</button>
+				</div>
+				<p class="note-dialog-eyebrow">A little note, just for you</p>
+				<h2 id="noteDialogTitle">A note for you</h2>
+			</div>
+			<div class="note-read-view" id="noteReadView">
+				<p class="note-dialog-message" id="noteDialogMessage"></p>
+				<p class="note-dialog-from" id="noteDialogFrom"></p>
+			</div>
+			<form class="note-edit-form hidden" id="noteEditForm">
+				<label for="editNoteText">Note</label>
+				<textarea id="editNoteText" name="text" rows="6" maxlength="500" required></textarea>
+				<label for="editNoteFrom">From</label>
+				<input id="editNoteFrom" name="from" maxlength="60">
+				<div class="note-edit-actions">
+					<button class="dialog-cancel-button" id="cancelNoteEdit" type="button">Cancel</button>
+					<button class="dialog-save-button" type="submit">Save changes</button>
+				</div>
+			</form>
+		</dialog>
+	</main>
 
-      <div class="table-wrapper">
-        <table class="love-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Message</th>
-              <th>From</th>
-              <th class="action-col hidden">Action</th>
-            </tr>
-          </thead>
-          <tbody id="notesTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- PHOTO GALLERY (TABLE) -->
-    <section>
-      <div class="section-title">
-        <span>📸</span> Our Moments
-      </div>
-
-      <!-- Add Photo Form -->
-      <form class="add-form hidden" id="addPhotoForm">
-        <div class="add-form-row">
-          <input type="url" id="photoSrc" placeholder="Image URL (https://...)" required>
-        </div>
-        <div class="add-form-row">
-          <input type="text" id="photoCaption" placeholder="Caption (e.g. our first date)" required maxlength="80">
-          <button type="submit" class="add-btn">➕ Add Photo</button>
-        </div>
-      </form>
-
-      <div class="table-wrapper">
-        <table class="love-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Photo</th>
-              <th>Caption</th>
-              <th class="action-col hidden">Action</th>
-            </tr>
-          </thead>
-          <tbody id="photosTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- VIDEO SECTION (TABLE) -->
-    <section>
-      <div class="section-title">
-        <span>🎬</span> Little Videos
-      </div>
-
-      <!-- Add Video Form -->
-      <form class="add-form hidden" id="addVideoForm">
-        <div class="add-form-row">
-          <input type="url" id="videoSrc" placeholder="Video URL (mp4)" required>
-        </div>
-        <div class="add-form-row">
-          <input type="url" id="videoPoster" placeholder="Poster image URL (optional)">
-        </div>
-        <div class="add-form-row">
-          <input type="text" id="videoNote" placeholder="Short note (e.g. our silly dance)" required maxlength="60">
-        </div>
-        <div class="add-form-row">
-          <input type="text" id="videoDesc" placeholder="Description" required maxlength="120">
-          <button type="submit" class="add-btn">➕ Add Video</button>
-        </div>
-      </form>
-
-      <div class="table-wrapper">
-        <table class="love-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Video</th>
-              <th>Note</th>
-              <th>Description</th>
-              <th class="action-col hidden">Action</th>
-            </tr>
-          </thead>
-          <tbody id="videosTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- MEMORIES SECTION -->
-    <section>
-      <div class="section-title">
-        <span>🧸</span> Precious Memories
-      </div>
-
-      <!-- Add Memory Form -->
-      <form class="add-form hidden" id="addMemoryForm">
-        <div class="add-form-row">
-          <input type="text" id="memoryText" placeholder="Describe the memory..." required maxlength="250">
-        </div>
-        <div class="add-form-row">
-          <input type="text" id="memoryDate" placeholder="Date (e.g. October 14)" required maxlength="40">
-          <button type="submit" class="add-btn">➕ Add Memory</button>
-        </div>
-      </form>
-
-      <div class="memories-list" id="memoriesList"></div>
-    </section>
-
-    <!-- FOOTER -->
-    <div class="footer">
-      I love you, always & forever
-      <small>made with ❤️ just for you</small>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
-
-    const firebaseConfig = {
-      apiKey: 'AIzaSyC2GxMbFFao-pmAglaG4Nrr1B6JwdH2A5s',
-      authDomain: 'shin-c63a8.firebaseapp.com',
-      projectId: 'shin-c63a8',
-      storageBucket: 'shin-c63a8.firebasestorage.app',
-      messagingSenderId: '488114449913',
-      appId: '1:488114449913:web:dc25616a618490ae596128',
-      measurementId: 'G-HZH6N84SBQ'
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    window.firebaseApp = app;
-    window.firebaseAnalytics = analytics;
-  </script>
-
-  <script src="script.js"></script>
+	<div class="modal-backdrop hidden" id="grantModal" role="dialog" aria-modal="true" aria-labelledby="grantTitle">
+		<div class="grant-card">
+			<span class="grant-confetti" aria-hidden="true">✦</span>
+			<div class="grant-icon" aria-hidden="true">♡</div>
+			<p class="top-label">You did it!</p>
+			<h2 id="grantTitle">Access Granted!</h2>
+			<p>Congrats you passed!</p>
+			<button class="primary-button" id="proceedButton" type="button">Proceed <span aria-hidden="true">→</span></button>
+		</div>
+	</div>
+	<div class="toast" id="toast" role="status" aria-live="polite"></div>
+	<script src="script.js"></script>
 </body>
 </html>

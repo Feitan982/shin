@@ -1,535 +1,454 @@
-/* ============================================
-   ROMANTIC SURPRISE WEBSITE - JAVASCRIPT
-   With Add/Edit/Delete functionality
-   ============================================ */
-
-// ---------- LOCALSTORAGE KEYS ----------
-const STORAGE_KEYS = {
-  notes: 'love_notes',
-  photos: 'love_photos',
-  videos: 'love_videos',
-  memories: 'love_memories'
+const collectionKeys = {
+	notes: 'birthday_gift_notes',
+	pictures: 'birthday_gift_pictures',
+	videos: 'birthday_gift_videos',
+	memories: 'birthday_gift_memories'
 };
 
-// ---------- FLOATING HEARTS BACKGROUND ----------
-function createFloatingHearts() {
-  const heartsBg = document.getElementById('heartsBg');
-  if (!heartsBg) return;
+const emptyMessages = {
+	notes: 'No notes yet. Add the first little love note.',
+	pictures: 'No pictures yet. Add a favorite moment.',
+	videos: 'No videos yet. Save a tiny movie moment.',
+	memories: 'No memories yet. Start with a favorite story.'
+};
 
-  const hearts = ['❤️', '💕', '💖', '💗', '🌸', '✨'];
-  const positions = [
-    { top: '10%', left: '5%',  delay: '0s' },
-    { top: '25%', left: '85%', delay: '2s' },
-    { top: '70%', left: '10%', delay: '5s' },
-    { top: '50%', left: '92%', delay: '1s' },
-    { top: '85%', left: '45%', delay: '7s' },
-    { top: '15%', left: '45%', delay: '4s' },
-    { top: '90%', left: '78%', delay: '3s' },
-    { top: '40%', left: '20%', delay: '6s' },
-  ];
-
-  positions.forEach((pos, i) => {
-    const span = document.createElement('span');
-    span.textContent = hearts[i % hearts.length];
-    span.style.top = pos.top;
-    span.style.left = pos.left;
-    span.style.animationDelay = pos.delay;
-    heartsBg.appendChild(span);
-  });
+function loadEntries(kind) {
+	try {
+		const entries = JSON.parse(localStorage.getItem(collectionKeys[kind]) || '[]');
+		return Array.isArray(entries) ? entries : [];
+	} catch {
+		return [];
+	}
 }
 
-// ---------- DEFAULT DATA ----------
-const defaultNotes = [
-  { text: '"Every morning I thank the universe for you. You\'re my favorite thought, my sweetest dream."', date: '— always yours' },
-  { text: '"You\'re the reason I smile at my phone like an idiot. And I love it."', date: '— 3:17 AM, thinking of you' },
-  { text: '"If I had to choose between you and a million dollars... I\'d choose you, obviously. Then we can spend the million together 😉"', date: '— your silly boy' },
-  { text: '"Even on my worst days, your voice is my calm. Thank you for existing, mahal."', date: '— forever grateful' }
-];
+const collections = Object.fromEntries(
+	Object.keys(collectionKeys).map((kind) => [kind, loadEntries(kind)])
+);
 
-const defaultPhotos = [
-  { src: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&auto=format&fit=crop', caption: 'first date vibes' },
-  { src: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=600&auto=format&fit=crop', caption: 'sunset with you' },
-  { src: 'https://images.unsplash.com/photo-1501901609772-df0848060b33?w=600&auto=format&fit=crop', caption: 'coffee & laughs' },
-  { src: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&auto=format&fit=crop', caption: 'my favorite hand to hold' },
-  { src: 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?w=600&auto=format&fit=crop', caption: 'walking with you' },
-  { src: 'https://images.unsplash.com/photo-1516589091380-5d8e87df6999?w=600&auto=format&fit=crop', caption: 'my safe place' }
-];
+let activeNoteIndex = null;
 
-const defaultVideos = [
-  { poster: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&auto=format&fit=crop', src: 'https://www.w3schools.com/html/mov_bbb.mp4', note: 'our silly dance', description: 'You make me laugh like no one else.' },
-  { poster: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=400&auto=format&fit=crop', src: 'https://www.w3schools.com/html/mov_bbb.mp4', note: 'beach day', description: 'Your smile in the sun, priceless.' },
-  { poster: 'https://images.unsplash.com/photo-1501901609772-df0848060b33?w=400&auto=format&fit=crop', src: 'https://www.w3schools.com/html/mov_bbb.mp4', note: 'coffee date', description: 'Simple moments, best with you.' }
-];
-
-const defaultMemories = [
-  { text: 'The first time we said "I love you" — my heart was racing so fast.', date: 'October 4' },
-  { text: 'That rainy afternoon we stayed in, watched movies, and ate pizza. Best day ever.', date: 'December 2' },
-  { text: 'Our first trip together — getting lost, laughing, and you stealing my hoodie.', date: 'Summer' },
-  { text: 'The night we stayed up until 4 AM just talking about our dreams. I knew you were the one.', date: 'January 20' },
-  { text: 'When you surprised me with my favorite food after a long day. You always know how to make me feel special.', date: 'March 8' }
-];
-
-// ---------- STORAGE HELPERS ----------
-function loadData(key, defaults) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return [...defaults];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [...defaults];
-  } catch (e) {
-    return [...defaults];
-  }
+function saveEntries(kind) {
+	try {
+		const entries = kind === 'pictures' ? collections.pictures.filter((entry) => !entry.databaseId) : collections[kind];
+		localStorage.setItem(collectionKeys[kind], JSON.stringify(entries));
+	} catch {
+		showToast('Could not save this item in your browser.');
+	}
 }
 
-function saveData(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (e) {
-    console.warn('Could not save data:', e);
-  }
+function openPictureDatabase() {
+	return new Promise((resolve, reject) => {
+		const request = indexedDB.open('birthday_gift_picture_store', 1);
+		request.onupgradeneeded = () => {
+			request.result.createObjectStore('pictures', { keyPath: 'id', autoIncrement: true });
+		};
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
+	});
 }
 
-// Data containers
-let notesData = loadData(STORAGE_KEYS.notes, defaultNotes);
-let photosData = loadData(STORAGE_KEYS.photos, defaultPhotos);
-let videosData = loadData(STORAGE_KEYS.videos, defaultVideos);
-let memoriesData = loadData(STORAGE_KEYS.memories, defaultMemories);
-
-// Edit mode
-let editMode = false;
-
-// ---------- RENDER FUNCTIONS ----------
-
-function renderNotes() {
-  const tbody = document.getElementById('notesTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  if (notesData.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-cell">No notes yet. Add one! 💕</td></tr>`;
-    return;
-  }
-
-  notesData.forEach((note, index) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="num-cell">${index + 1}</td>
-      <td class="note-text">${escapeHtml(note.text)}</td>
-      <td class="note-from">${escapeHtml(note.date)}</td>
-      <td class="action-col action-cell ${editMode ? '' : 'hidden'}">
-        <button class="edit-btn" data-type="note" data-index="${index}" title="Edit">✏️</button>
-        <button class="delete-btn" data-type="note" data-index="${index}" title="Delete">🗑️</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
+function getSavedPictures(database) {
+	return new Promise((resolve, reject) => {
+		const request = database.transaction('pictures').objectStore('pictures').getAll();
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
+	});
 }
 
-function renderPhotos() {
-  const tbody = document.getElementById('photosTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  if (photosData.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-cell">No photos yet. Add one! 📸</td></tr>`;
-    return;
-  }
-
-  photosData.forEach((photo, index) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="num-cell">${index + 1}</td>
-      <td class="photo-cell">
-        <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.caption)}" loading="lazy" class="table-photo" onerror="this.src='https://via.placeholder.com/140x140/ffeef2/d46b8c?text=%E2%9D%A4'">
-      </td>
-      <td class="caption-cell">${escapeHtml(photo.caption)}</td>
-      <td class="action-col action-cell ${editMode ? '' : 'hidden'}">
-        <button class="edit-btn" data-type="photo" data-index="${index}" title="Edit">✏️</button>
-        <button class="delete-btn" data-type="photo" data-index="${index}" title="Delete">🗑️</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
+function storePicture(database, picture) {
+	return new Promise((resolve, reject) => {
+		const transaction = database.transaction('pictures', 'readwrite');
+		const request = transaction.objectStore('pictures').add(picture);
+		let id;
+		request.onsuccess = () => { id = request.result; };
+		transaction.oncomplete = () => resolve(id);
+		transaction.onerror = () => reject(transaction.error);
+		transaction.onabort = () => reject(transaction.error || new Error('Picture save was cancelled.'));
+	});
 }
 
-function renderVideos() {
-  const tbody = document.getElementById('videosTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  if (videosData.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty-cell">No videos yet. Add one! 🎬</td></tr>`;
-    return;
-  }
-
-  videosData.forEach((video, index) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="num-cell">${index + 1}</td>
-      <td class="video-cell">
-        <video controls poster="${escapeHtml(video.poster || '')}" preload="metadata" class="table-video">
-          <source src="${escapeHtml(video.src)}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      </td>
-      <td class="video-note-cell">${escapeHtml(video.note)}</td>
-      <td class="video-desc-cell">${escapeHtml(video.description)}</td>
-      <td class="action-col action-cell ${editMode ? '' : 'hidden'}">
-        <button class="edit-btn" data-type="video" data-index="${index}" title="Edit">✏️</button>
-        <button class="delete-btn" data-type="video" data-index="${index}" title="Delete">🗑️</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
+function deleteSavedPicture(id) {
+	return openPictureDatabase().then((database) => new Promise((resolve, reject) => {
+		const transaction = database.transaction('pictures', 'readwrite');
+		transaction.objectStore('pictures').delete(id);
+		transaction.oncomplete = () => resolve();
+		transaction.onerror = () => reject(transaction.error);
+	}));
 }
 
-function renderMemories() {
-  const container = document.getElementById('memoriesList');
-  if (!container) return;
-  container.innerHTML = '';
-
-  if (memoriesData.length === 0) {
-    container.innerHTML = `<div class="empty-cell">No memories yet. Add one! 🧸</div>`;
-    return;
-  }
-
-  memoriesData.forEach((memory, index) => {
-    const item = document.createElement('div');
-    item.className = 'memory-item';
-    item.innerHTML = `
-      ${escapeHtml(memory.text)}
-      <span class="memory-date">${escapeHtml(memory.date)}</span>
-      <div class="memory-actions ${editMode ? '' : 'hidden'}">
-        <button class="edit-btn memory-edit" data-type="memory" data-index="${index}" title="Edit">✏️</button>
-        <button class="delete-btn memory-delete" data-type="memory" data-index="${index}" title="Delete">🗑️</button>
-      </div>
-    `;
-    container.appendChild(item);
-  });
+async function compressPicture(file) {
+	const image = await createImageBitmap(file);
+	const maxDimension = 1100;
+	const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+	const canvas = document.createElement('canvas');
+	canvas.width = Math.round(image.width * scale);
+	canvas.height = Math.round(image.height * scale);
+	canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+	image.close();
+	const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.82));
+	if (!blob) throw new Error('This image could not be resized.');
+	return blob;
 }
 
-// ---------- SECURITY: escape HTML ----------
-function escapeHtml(str) {
-  if (str === undefined || str === null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+async function loadSavedPictures() {
+	try {
+		const database = await openPictureDatabase();
+		const savedPictures = await getSavedPictures(database);
+		savedPictures.forEach((picture) => {
+			collections.pictures.push({
+				databaseId: picture.id,
+				url: URL.createObjectURL(picture.blob),
+				caption: picture.caption
+			});
+		});
+		renderCollection('pictures');
+	} catch (error) {
+		console.warn('Could not load saved pictures:', error);
+	}
 }
 
-// ---------- RENDER ALL ----------
-function renderAll() {
-  renderNotes();
-  renderPhotos();
-  renderVideos();
-  renderMemories();
-  applyEditModeVisibility();
+function makeElement(tagName, className, text) {
+	const element = document.createElement(tagName);
+	if (className) element.className = className;
+	if (text !== undefined) element.textContent = text;
+	return element;
 }
 
-// ---------- EDIT MODE ----------
-function applyEditModeVisibility() {
-  const actionCols = document.querySelectorAll('.action-col');
-  const memoryActions = document.querySelectorAll('.memory-actions');
-  const addForms = document.querySelectorAll('.add-form');
-  const editStatus = document.getElementById('editStatus');
-  const toggleBtn = document.getElementById('toggleEditMode');
+function renderCollection(kind) {
+	const container = document.getElementById(`${kind}List`);
+	if (!container) return;
+	container.replaceChildren();
 
-  if (editMode) {
-    actionCols.forEach(el => el.classList.remove('hidden'));
-    memoryActions.forEach(el => el.classList.remove('hidden'));
-    addForms.forEach(el => el.classList.remove('hidden'));
-    if (editStatus) editStatus.textContent = '✏️ Edit mode ON';
-    if (toggleBtn) {
-      toggleBtn.textContent = '👁️ Switch to View Mode';
-      toggleBtn.classList.add('active');
-    }
-  } else {
-    actionCols.forEach(el => el.classList.add('hidden'));
-    memoryActions.forEach(el => el.classList.add('hidden'));
-    addForms.forEach(el => el.classList.add('hidden'));
-    if (editStatus) editStatus.textContent = 'Viewing only';
-    if (toggleBtn) {
-      toggleBtn.textContent = '✏️ Enable Edit Mode';
-      toggleBtn.classList.remove('active');
-    }
-  }
+	if (collections[kind].length === 0) {
+		container.append(makeElement('p', 'empty-state', emptyMessages[kind]));
+		return;
+	}
+
+	collections[kind].forEach((entry, index) => {
+		const card = makeElement('article', `entry-card ${kind}-card`);
+		const itemNames = { notes: 'note', pictures: 'picture', videos: 'video', memories: 'memory' };
+		const removeButton = makeElement('button', 'remove-button', '×');
+		removeButton.type = 'button';
+		removeButton.dataset.kind = kind;
+		removeButton.dataset.index = String(index);
+		removeButton.setAttribute('aria-label', `Remove ${itemNames[kind]}`);
+
+		// ---- NOTES: open the full note in a compact dialog ----
+		if (kind === 'notes') {
+			card.classList.add('note-row');
+			const toggle = makeElement('button', 'note-open-button');
+			toggle.type = 'button';
+			toggle.setAttribute('aria-haspopup', 'dialog');
+			const preview = (entry.text || '').replace(/\s+/g, ' ').trim() || 'A note for you';
+			toggle.append(
+				makeElement('span', 'note-row-preview', preview),
+				makeElement('span', 'note-row-arrow', '↗')
+			);
+			toggle.addEventListener('click', () => openNote(index));
+			card.append(toggle, removeButton);
+			container.append(card);
+			return;
+		}
+
+		// ---- All other kinds: original card layout ----
+		const heading = makeElement('div', 'entry-card-heading');
+		const cardTitle = kind === 'memories' ? (entry.date || 'A sweet memory') : entry.caption;
+		const title = makeElement('h3', '', cardTitle);
+		heading.append(title, removeButton);
+		card.append(heading);
+
+		if (kind === 'pictures') {
+			const image = makeElement('img', 'entry-image');
+			image.src = entry.url;
+			image.alt = entry.caption || 'A favorite picture';
+			image.loading = 'lazy';
+			card.insertBefore(image, heading);
+		} else if (kind === 'videos') {
+			const video = makeElement('video', 'entry-video');
+			video.src = entry.url;
+			video.controls = true;
+			video.preload = 'metadata';
+			card.insertBefore(video, heading);
+		} else {
+			card.append(makeElement('p', 'entry-copy', entry.text));
+			if (entry.date) card.append(makeElement('p', 'entry-byline', entry.date));
+		}
+		container.append(card);
+	});
 }
 
-function setupEditToggle() {
-  const btn = document.getElementById('toggleEditMode');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    editMode = !editMode;
-    renderAll();
-  });
-}
-
-// ---------- ADD HANDLERS ----------
-function setupAddForms() {
-  // Add Note
-  const addNoteForm = document.getElementById('addNoteForm');
-  if (addNoteForm) {
-    addNoteForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = document.getElementById('noteText').value.trim();
-      const from = document.getElementById('noteFrom').value.trim() || '— me';
-      if (!text) return;
-      notesData.push({ text, date: from });
-      saveData(STORAGE_KEYS.notes, notesData);
-      addNoteForm.reset();
-      renderNotes();
-      showToast('Note added! 💌');
-    });
-  }
-
-  // Add Photo
-  const addPhotoForm = document.getElementById('addPhotoForm');
-  if (addPhotoForm) {
-    addPhotoForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const src = document.getElementById('photoSrc').value.trim();
-      const caption = document.getElementById('photoCaption').value.trim();
-      if (!src || !caption) return;
-      photosData.push({ src, caption });
-      saveData(STORAGE_KEYS.photos, photosData);
-      addPhotoForm.reset();
-      renderPhotos();
-      showToast('Photo added! 📸');
-    });
-  }
-
-  // Add Video
-  const addVideoForm = document.getElementById('addVideoForm');
-  if (addVideoForm) {
-    addVideoForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const src = document.getElementById('videoSrc').value.trim();
-      const poster = document.getElementById('videoPoster').value.trim();
-      const note = document.getElementById('videoNote').value.trim();
-      const description = document.getElementById('videoDesc').value.trim();
-      if (!src || !note || !description) return;
-      videosData.push({ src, poster, note, description });
-      saveData(STORAGE_KEYS.videos, videosData);
-      addVideoForm.reset();
-      renderVideos();
-      showToast('Video added! 🎬');
-    });
-  }
-
-  // Add Memory
-  const addMemoryForm = document.getElementById('addMemoryForm');
-  if (addMemoryForm) {
-    addMemoryForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = document.getElementById('memoryText').value.trim();
-      const date = document.getElementById('memoryDate').value.trim();
-      if (!text || !date) return;
-      memoriesData.push({ text, date });
-      saveData(STORAGE_KEYS.memories, memoriesData);
-      addMemoryForm.reset();
-      renderMemories();
-      showToast('Memory added! 🧸');
-    });
-  }
-}
-
-// ---------- EDIT / DELETE HANDLER ----------
-function editEntry(type, index) {
-  if (type === 'note') {
-    const current = notesData[index];
-    if (!current) return;
-    const nextText = window.prompt('Edit your sweet note:', current.text || '');
-    if (nextText === null) return;
-    const nextFrom = window.prompt('Edit who it is from:', current.date || '');
-    if (nextFrom === null) return;
-    notesData[index] = {
-      text: nextText.trim() || current.text,
-      date: nextFrom.trim() || current.date
-    };
-    saveData(STORAGE_KEYS.notes, notesData);
-    renderNotes();
-    showToast('Note updated! 💌');
-    return;
-  }
-
-  if (type === 'photo') {
-    const current = photosData[index];
-    if (!current) return;
-    const nextSrc = window.prompt('Edit image URL:', current.src || '');
-    if (nextSrc === null) return;
-    const nextCaption = window.prompt('Edit caption:', current.caption || '');
-    if (nextCaption === null) return;
-    photosData[index] = {
-      src: nextSrc.trim() || current.src,
-      caption: nextCaption.trim() || current.caption
-    };
-    saveData(STORAGE_KEYS.photos, photosData);
-    renderPhotos();
-    showToast('Photo updated! 📸');
-    return;
-  }
-
-  if (type === 'video') {
-    const current = videosData[index];
-    if (!current) return;
-    const nextSrc = window.prompt('Edit video URL:', current.src || '');
-    if (nextSrc === null) return;
-    const nextPoster = window.prompt('Edit poster image URL:', current.poster || '');
-    if (nextPoster === null) return;
-    const nextNote = window.prompt('Edit short note:', current.note || '');
-    if (nextNote === null) return;
-    const nextDescription = window.prompt('Edit description:', current.description || '');
-    if (nextDescription === null) return;
-    videosData[index] = {
-      src: nextSrc.trim() || current.src,
-      poster: nextPoster.trim() || current.poster,
-      note: nextNote.trim() || current.note,
-      description: nextDescription.trim() || current.description
-    };
-    saveData(STORAGE_KEYS.videos, videosData);
-    renderVideos();
-    showToast('Video updated! 🎬');
-    return;
-  }
-
-  if (type === 'memory') {
-    const current = memoriesData[index];
-    if (!current) return;
-    const nextText = window.prompt('Edit memory:', current.text || '');
-    if (nextText === null) return;
-    const nextDate = window.prompt('Edit date:', current.date || '');
-    if (nextDate === null) return;
-    memoriesData[index] = {
-      text: nextText.trim() || current.text,
-      date: nextDate.trim() || current.date
-    };
-    saveData(STORAGE_KEYS.memories, memoriesData);
-    renderMemories();
-    showToast('Memory updated! 🧸');
-  }
-}
-
-function setupDeleteHandler() {
-  document.addEventListener('click', (e) => {
-    const editBtn = e.target.closest('.edit-btn');
-    if (editBtn) {
-      const type = editBtn.dataset.type;
-      const index = parseInt(editBtn.dataset.index, 10);
-      if (!isNaN(index)) {
-        editEntry(type, index);
-      }
-      return;
-    }
-
-    const btn = e.target.closest('.delete-btn');
-    if (!btn) return;
-
-    const type = btn.dataset.type;
-    const index = parseInt(btn.dataset.index, 10);
-    if (isNaN(index)) return;
-
-    let itemName = 'item';
-    if (type === 'note') itemName = 'note';
-    else if (type === 'photo') itemName = 'photo';
-    else if (type === 'video') itemName = 'video';
-    else if (type === 'memory') itemName = 'memory';
-
-    if (!confirm(`Delete this ${itemName}? 🥺`)) return;
-
-    if (type === 'note') {
-      notesData.splice(index, 1);
-      saveData(STORAGE_KEYS.notes, notesData);
-      renderNotes();
-    } else if (type === 'photo') {
-      photosData.splice(index, 1);
-      saveData(STORAGE_KEYS.photos, photosData);
-      renderPhotos();
-    } else if (type === 'video') {
-      videosData.splice(index, 1);
-      saveData(STORAGE_KEYS.videos, videosData);
-      renderVideos();
-    } else if (type === 'memory') {
-      memoriesData.splice(index, 1);
-      saveData(STORAGE_KEYS.memories, memoriesData);
-      renderMemories();
-    }
-
-    showToast(`${itemName.charAt(0).toUpperCase() + itemName.slice(1)} deleted.`);
-  });
-}
-
-// ---------- TOAST ----------
 function showToast(message) {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    toast.className = 'toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.classList.add('show');
-  clearTimeout(toast._timeout);
-  toast._timeout = setTimeout(() => {
-    toast.classList.remove('show');
-  }, 2200);
+	const toast = document.getElementById('toast');
+	toast.textContent = message;
+	toast.classList.add('show');
+	window.clearTimeout(showToast.timeoutId);
+	showToast.timeoutId = window.setTimeout(() => toast.classList.remove('show'), 2400);
 }
 
-// ---------- LOGIN HANDLER (Monthsary) ----------
-const ACCEPTED_FORMATS = [
-  '10-04-26', '10-4-26', '100426', '10/04/26', '10/4/26', '10.04.26', '10.4.26'
-];
-
-function handleLogin(event) {
-  event.preventDefault();
-
-  const passwordInput = document.getElementById('password');
-  const feedback = document.getElementById('loginFeedback');
-  const loginShell = document.getElementById('loginShell');
-  const contentShell = document.getElementById('contentShell');
-
-  if (!passwordInput || !feedback || !loginShell || !contentShell) return;
-
-  const entered = passwordInput.value.trim();
-
-  if (!entered) {
-    feedback.textContent = 'Please enter our monthsary 🥺';
-    feedback.classList.remove('success');
-    return;
-  }
-
-  const normalized = entered.replace(/[\/\.\s]/g, '-');
-
-  if (ACCEPTED_FORMATS.includes(entered) || ACCEPTED_FORMATS.includes(normalized)) {
-    feedback.textContent = 'Welcome, my love! 💖';
-    feedback.classList.add('success');
-
-    setTimeout(() => {
-      loginShell.classList.add('hidden');
-      contentShell.classList.remove('hidden');
-      contentShell.classList.add('show');
-    }, 500);
-    return;
-  }
-
-  feedback.textContent = 'Hmm, that\'s not our monthsary 🥺 Try again?';
-  feedback.classList.remove('success');
-  passwordInput.value = '';
-  passwordInput.focus();
+function setScreen(screenId) {
+	document.querySelectorAll('.screen').forEach((screen) => {
+		screen.classList.toggle('hidden', screen.id !== screenId);
+	});
+	const activeScreen = document.getElementById(screenId);
+	activeScreen.classList.remove('screen-enter');
+	void activeScreen.offsetWidth;
+	activeScreen.classList.add('screen-enter');
 }
 
-// ---------- INITIALIZE ----------
+function selectTab(kind) {
+	document.querySelectorAll('.tab-button').forEach((tab) => {
+		const selected = tab.dataset.view === kind;
+		tab.classList.toggle('active', selected);
+		tab.setAttribute('aria-selected', String(selected));
+		tab.tabIndex = selected ? 0 : -1;
+	});
+
+	document.querySelectorAll('[data-panel]').forEach((panel) => {
+		const selected = panel.dataset.panel === kind;
+		panel.hidden = !selected;
+		panel.classList.toggle('hidden', !selected);
+	});
+}
+
+function setupCodeForm() {
+	const inputs = [...document.querySelectorAll('.code-box')];
+	const message = document.getElementById('codeMessage');
+
+	inputs.forEach((input, index) => {
+		input.addEventListener('input', () => {
+			input.value = input.value.replace(/\D/g, '').slice(-1);
+			if (input.value && index < inputs.length - 1) inputs[index + 1].focus();
+		});
+		input.addEventListener('keydown', (event) => {
+			if (event.key === 'Backspace' && !input.value && index > 0) inputs[index - 1].focus();
+			if (event.key === 'ArrowLeft' && index > 0) inputs[index - 1].focus();
+			if (event.key === 'ArrowRight' && index < inputs.length - 1) inputs[index + 1].focus();
+		});
+		input.addEventListener('paste', (event) => {
+			const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, inputs.length);
+			if (!pasted) return;
+			event.preventDefault();
+			[...pasted].forEach((digit, digitIndex) => { inputs[digitIndex].value = digit; });
+			inputs[Math.min(pasted.length, inputs.length - 1)].focus();
+		});
+	});
+
+	document.getElementById('codeForm').addEventListener('submit', (event) => {
+		event.preventDefault();
+		const enteredCode = inputs.map((input) => input.value).join('');
+		if (enteredCode !== '100426') {
+			message.textContent = 'Not quite, try that special date again ♡';
+			inputs.forEach((input) => { input.value = ''; });
+			inputs[0].focus();
+			return;
+		}
+		message.textContent = '';
+		document.getElementById('grantModal').classList.remove('hidden');
+		document.getElementById('proceedButton').focus();
+	});
+}
+
+function setupProceedButton() {
+	document.getElementById('proceedButton').addEventListener('click', () => {
+		document.getElementById('grantModal').classList.add('hidden');
+		setScreen('keepsakeScreen');
+		selectTab('notes');
+		renderAllCollections();
+	});
+}
+
+function setupBackButton() {
+	const backButton = document.getElementById('backButton');
+	if (!backButton) return;
+	backButton.addEventListener('click', () => {
+		setScreen('accessScreen');
+		const inputs = [...document.querySelectorAll('.code-box')];
+		inputs.forEach((input) => { input.value = ''; });
+		document.getElementById('codeMessage').textContent = '';
+		inputs[0]?.focus();
+	});
+}
+
+function openNote(index) {
+	const note = collections.notes[index];
+	if (!note) return;
+	activeNoteIndex = index;
+	document.getElementById('noteDialogMessage').textContent = note.text || '';
+	const from = note.from || note.date || '';
+	const attribution = document.getElementById('noteDialogFrom');
+	attribution.textContent = from ? `With love, ${from}` : '';
+	attribution.classList.toggle('hidden', !from);
+	document.getElementById('noteReadView').classList.remove('hidden');
+	document.getElementById('noteEditForm').classList.add('hidden');
+	document.getElementById('editNoteButton').classList.remove('hidden');
+	const dialog = document.getElementById('noteDialog');
+	if (!dialog.open) dialog.showModal();
+}
+
+function setupNoteDialog() {
+	const dialog = document.getElementById('noteDialog');
+	const editButton = document.getElementById('editNoteButton');
+	const editForm = document.getElementById('noteEditForm');
+	const readView = document.getElementById('noteReadView');
+
+	editButton.addEventListener('click', () => {
+		const note = collections.notes[activeNoteIndex];
+		if (!note) return;
+		document.getElementById('editNoteText').value = note.text || '';
+		document.getElementById('editNoteFrom').value = note.from || note.date || '';
+		readView.classList.add('hidden');
+		editForm.classList.remove('hidden');
+		editButton.classList.add('hidden');
+		document.getElementById('editNoteText').focus();
+	});
+
+	document.getElementById('cancelNoteEdit').addEventListener('click', () => {
+		editForm.classList.add('hidden');
+		readView.classList.remove('hidden');
+		editButton.classList.remove('hidden');
+	});
+
+	editForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+		const note = collections.notes[activeNoteIndex];
+		const text = document.getElementById('editNoteText').value.trim();
+		if (!note || !text) return;
+		note.text = text;
+		note.from = document.getElementById('editNoteFrom').value.trim();
+		delete note.date;
+		saveEntries('notes');
+		renderCollection('notes');
+		openNote(activeNoteIndex);
+		showToast('Note updated ♡');
+	});
+
+	document.getElementById('closeNoteButton').addEventListener('click', () => dialog.close());
+	dialog.addEventListener('click', (event) => {
+		if (event.target === dialog) dialog.close();
+	});
+	dialog.addEventListener('close', () => {
+		activeNoteIndex = null;
+		editForm.reset();
+		editForm.classList.add('hidden');
+		readView.classList.remove('hidden');
+		editButton.classList.remove('hidden');
+	});
+}
+
+function safeMediaUrl(value) {
+	try {
+		const url = new URL(value);
+		return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+	} catch {
+		return '';
+	}
+}
+
+function setupCollections() {
+	document.querySelectorAll('.tab-button').forEach((tab, index, tabs) => {
+		tab.addEventListener('click', () => selectTab(tab.dataset.view));
+		tab.addEventListener('keydown', (event) => {
+			if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+			event.preventDefault();
+			const offset = event.key === 'ArrowRight' ? 1 : -1;
+			const nextTab = tabs[(index + offset + tabs.length) % tabs.length];
+			selectTab(nextTab.dataset.view);
+			nextTab.focus();
+		});
+	});
+
+	document.querySelectorAll('[data-add]').forEach((button) => {
+		button.addEventListener('click', () => {
+			const form = document.getElementById(button.dataset.add);
+			form.classList.toggle('hidden');
+			if (!form.classList.contains('hidden')) {
+				const fileInput = form.querySelector('input[type="file"]');
+				if (fileInput) {
+					fileInput.focus();
+					fileInput.click();
+				} else {
+					form.querySelector('input, textarea')?.focus();
+				}
+			}
+		});
+	});
+
+	document.querySelectorAll('.entry-form').forEach((form) => {
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			const kind = form.dataset.kind;
+			const values = Object.fromEntries(new FormData(form));
+			if (kind === 'pictures') {
+				const files = [...form.querySelector('[name="files"]').files];
+				const caption = values.caption.trim();
+				const submitButton = form.querySelector('[type="submit"]');
+				let added = 0;
+				submitButton.disabled = true;
+				try {
+					const database = await openPictureDatabase();
+					for (const file of files) {
+						const blob = await compressPicture(file);
+						const savedCaption = caption || file.name.replace(/\.[^.]+$/, '');
+						const databaseId = await storePicture(database, { blob, caption: savedCaption });
+						collections.pictures.push({ databaseId, blob, url: URL.createObjectURL(blob), caption: savedCaption });
+						added++;
+					}
+					form.reset();
+					form.classList.add('hidden');
+					renderCollection('pictures');
+					showToast(`Added ${added} picture${added === 1 ? '' : 's'} ♡`);
+				} catch (error) {
+					console.warn('Could not add pictures:', error);
+					if (added) {
+						form.reset();
+						form.classList.add('hidden');
+						renderCollection('pictures');
+					}
+					showToast(added ? `Added ${added}; one or more pictures could not be saved.` : 'Could not save those pictures. Try smaller files.');
+				} finally {
+					submitButton.disabled = false;
+				}
+				return;
+			}
+			if (kind === 'videos') {
+				values.url = safeMediaUrl(values.url);
+				if (!values.url) {
+					showToast('Please use a valid http or https media link.');
+					return;
+				}
+			}
+			collections[kind].push(values);
+			saveEntries(kind);
+			form.reset();
+			form.classList.add('hidden');
+			renderCollection(kind);
+			showToast('Added to your keepsakes ♡');
+		});
+	});
+
+	document.addEventListener('click', (event) => {
+		const button = event.target.closest('.remove-button');
+		if (!button) return;
+		const { kind, index } = button.dataset;
+		const entry = collections[kind][Number(index)];
+		if (kind === 'pictures' && entry.databaseId) {
+			deleteSavedPicture(entry.databaseId).catch((error) => console.warn('Could not delete saved picture:', error));
+		}
+		collections[kind].splice(Number(index), 1);
+		saveEntries(kind);
+		renderCollection(kind);
+	});
+}
+
+function renderAllCollections() {
+	Object.keys(collectionKeys).forEach(renderCollection);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  createFloatingHearts();
-  renderAll();
-  setupEditToggle();
-  setupAddForms();
-  setupDeleteHandler();
-
-  const loginForm = document.getElementById('loginForm');
-  if (loginForm) {
-    loginForm.addEventListener('submit', handleLogin);
-  }
+	setupCodeForm();
+	setupProceedButton();
+	setupBackButton();
+	setupNoteDialog();
+	setupCollections();
+	loadSavedPictures();
 });
