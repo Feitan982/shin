@@ -4,6 +4,7 @@ const collectionKeys = {
 	videos: 'birthday_gift_videos',
 	memories: 'birthday_gift_memories'
 };
+const backgroundStorageKey = 'birthday_gift_background';
 
 const emptyMessages = {
 	notes: 'No notes yet. Add the first little love note.',
@@ -361,6 +362,70 @@ function setupBackButton() {
 	});
 }
 
+function setupBackgroundPicker() {
+	const picker = document.getElementById('backgroundPhotoInput');
+	const chooseButton = document.getElementById('chooseBackgroundButton');
+	const removeButton = document.getElementById('removeBackgroundButton');
+	const keepsakeScreen = document.getElementById('keepsakeScreen');
+	if (!picker || !chooseButton || !removeButton || !keepsakeScreen) return;
+
+	function applyBackground(dataUrl) {
+		keepsakeScreen.style.setProperty('--couple-background-photo', `url("${dataUrl}")`);
+		removeButton.classList.remove('hidden');
+	}
+
+	try {
+		const savedBackground = localStorage.getItem(backgroundStorageKey);
+		if (savedBackground) applyBackground(savedBackground);
+	} catch (error) {
+		console.warn('Could not load the saved background photo:', error);
+		showToast('Could not load your saved background photo.');
+	}
+
+	chooseButton.addEventListener('click', () => picker.click());
+	picker.addEventListener('change', async () => {
+		const file = picker.files?.[0];
+		if (!file) return;
+		if (!file.type.startsWith('image/')) {
+			showToast('Please choose an image file for your background.');
+			picker.value = '';
+			return;
+		}
+
+		chooseButton.disabled = true;
+		try {
+			const compressedImage = await compressPicture(file);
+			const dataUrl = await new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = () => resolve(reader.result);
+				reader.onerror = () => reject(reader.error || new Error('The image could not be read.'));
+				reader.readAsDataURL(compressedImage);
+			});
+			localStorage.setItem(backgroundStorageKey, dataUrl);
+			applyBackground(dataUrl);
+			showToast('Background photo updated ♡');
+		} catch (error) {
+			console.warn('Could not save the background photo:', error);
+			showToast('Could not save that photo. Try a smaller image.');
+		} finally {
+			chooseButton.disabled = false;
+			picker.value = '';
+		}
+	});
+
+	removeButton.addEventListener('click', () => {
+		try {
+			localStorage.removeItem(backgroundStorageKey);
+			keepsakeScreen.style.removeProperty('--couple-background-photo');
+			removeButton.classList.add('hidden');
+			showToast('Background photo removed.');
+		} catch (error) {
+			console.warn('Could not remove the saved background photo:', error);
+			showToast('Could not remove the saved background photo.');
+		}
+	});
+}
+
 /* ============================================================
    NOTE DIALOG
    ============================================================ */
@@ -556,6 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	setupCodeForm();
 	setupProceedButton();
 	setupBackButton();
+	setupBackgroundPicker();
 	setupNoteDialog();
 	setupCollections();
 	loadSavedPictures();

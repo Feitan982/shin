@@ -357,7 +357,16 @@ h1, h2, h3, p { margin-top: 0; }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-.keepsake-screen { display: block; padding: 0 0 3rem; }
+.keepsake-screen {
+	display: block;
+	padding: 0 0 3rem;
+	background-image:
+		linear-gradient(rgba(13, 16, 32, 0.64), rgba(13, 16, 32, 0.82)),
+		var(--couple-background-photo, none);
+	background-attachment: fixed;
+	background-position: center;
+	background-size: cover;
+}
 .site-header {
 	position: sticky;
 	z-index: 3;
@@ -781,7 +790,103 @@ main { position: relative; z-index: 1; }
 .primary-button:hover { background: #ddc494; box-shadow: 0 6px 0 #90764d, 0 12px 25px rgba(0, 0, 0, 0.24); }
 .form-message { color: #e4a8b3; }
 
+.top-couple-bar {
+	position: sticky;
+	top: 0;
+	z-index: 6;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	width: min(100%, 1200px);
+	margin: 0 auto;
+	padding: 0.75rem 1.3rem 0.8rem;
+	border-bottom: 1px solid rgba(192, 174, 213, 0.18);
+	background: rgba(14, 16, 32, 0.82);
+	backdrop-filter: blur(8px);
+}
+
+.couple-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	min-width: 0;
+}
+
+.brand-mark {
+	color: #e6d4ad;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 1.3rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.brand-name {
+	color: #f1e8d7;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 1.15rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.couple-nav {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 0.8rem 1.2rem;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.couple-nav a {
+	color: #d8cfde;
+	text-decoration: none;
+	transition: color 150ms ease;
+}
+
+.couple-nav a:hover,
+.couple-nav a:focus-visible {
+	color: #e6d4ad;
+}
+
+.couple-nav .background-picker-button,
+.couple-nav .background-reset-button {
+	border: 1px solid rgba(199, 168, 120, 0.32);
+	border-radius: 3px;
+	background: rgba(199, 168, 120, 0.08);
+	color: #e1d1b5;
+	font: inherit;
+	letter-spacing: inherit;
+	padding: 0.45rem 0.65rem;
+	text-transform: inherit;
+	transition: background 150ms ease, color 150ms ease;
+}
+
+.couple-nav .background-picker-button:hover,
+.couple-nav .background-reset-button:hover {
+	background: rgba(199, 168, 120, 0.18);
+	color: #f1e8d7;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	clip-path: inset(50%);
+}
+
 .site-header {
+	width: min(100%, 1200px);
+	margin: 0 auto;
+	position: relative;
+	top: auto;
+	z-index: 2;
 	border-color: rgba(192, 174, 213, 0.16);
 	background: rgba(14, 16, 32, 0.93);
 	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
@@ -825,6 +930,104 @@ main { position: relative; z-index: 1; }
 .site-footer { color: #a9a0b2; }
 .site-footer span { color: #d2b47d; }
 .toast { border-color: rgba(199, 168, 120, 0.28); border-radius: 4px; background: #202137; color: #ead7af; }
+
+.couple-name-hero {
+	position: relative;
+	display: grid;
+	min-height: clamp(390px, 56.25vw, 760px);
+	place-content: center;
+	justify-items: center;
+	overflow: hidden;
+	padding: 3rem 1.25rem;
+	text-align: center;
+	isolation: isolate;
+	background:
+		radial-gradient(ellipse at 50% 48%, rgba(109, 78, 145, 0.3), transparent 36%),
+		radial-gradient(ellipse at 50% 52%, rgba(65, 51, 101, 0.24), transparent 61%),
+		linear-gradient(180deg, #0c1022 0%, #101226 55%, #0d1020 100%);
+}
+
+.couple-name-hero::before,
+.couple-name-hero::after {
+	position: absolute;
+	z-index: 0;
+	border: 1px solid rgba(210, 184, 133, 0.18);
+	border-radius: 50%;
+	content: '';
+	pointer-events: none;
+	box-shadow: 0 0 40px rgba(199, 168, 120, 0.025);
+}
+
+.couple-name-hero::before {
+	width: min(70vw, 760px);
+	aspect-ratio: 1;
+}
+
+.couple-name-hero::after {
+	width: min(55vw, 600px);
+	aspect-ratio: 1;
+	border-color: rgba(210, 184, 133, 0.12);
+}
+
+.couple-hero-eyebrow,
+.couple-hero-title,
+.couple-hero-caption,
+.couple-hero-link {
+	position: relative;
+	z-index: 1;
+}
+
+.couple-hero-eyebrow {
+	margin: 0 0 0.6rem;
+	color: #d8c394;
+	font-size: 0.68rem;
+	font-weight: 800;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+}
+
+.couple-hero-title {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 0.2em;
+	margin: 0;
+	color: #f4eddf;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: clamp(4.5rem, 12vw, 11rem);
+	font-weight: 400;
+	letter-spacing: -0.055em;
+	line-height: 0.86;
+	text-shadow: 0 4px 42px rgba(5, 7, 17, 0.58), 0 0 34px rgba(225, 214, 193, 0.08);
+}
+
+.couple-hero-divider {
+	color: #d2b77e;
+	font-size: 0.76em;
+	font-weight: 400;
+}
+
+.couple-hero-caption {
+	margin: 1.15rem 0 0;
+	color: #d0c8d3;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: clamp(1rem, 1.8vw, 1.3rem);
+	letter-spacing: 0.055em;
+}
+
+.couple-hero-link {
+	margin-top: 1.5rem;
+	color: #d8cfde;
+	font-size: 0.72rem;
+	text-decoration: none;
+}
+
+.couple-hero-link span {
+	margin-left: 0.4rem;
+	color: #d5c7af;
+}
+
+.couple-hero-link:hover { color: #e6d4ad; }
 
 /* ============================================================
    TOGETHER HERO — floating relationship timer
@@ -912,6 +1115,17 @@ main { position: relative; z-index: 1; }
 }
 
 @media (max-width: 700px) {
+	.top-couple-bar {
+		padding-inline: 0.85rem;
+		align-items: flex-start;
+		flex-direction: column;
+	}
+	.couple-nav {
+		justify-content: flex-start;
+		gap: 0.55rem 0.9rem;
+	}
+	.couple-name-hero { min-height: 48vh; }
+	.couple-hero-title { font-size: clamp(3.5rem, 13vw, 6rem); }
 	.together-hero { width: min(100% - 1.5rem, 780px); padding-block: 1.1rem; }
 	.together-title { font-size: 1.55rem; }
 	.time-grid { margin-top: 0.8rem; }

@@ -63,12 +63,33 @@
 		</section>
 
 		<section class="screen keepsake-screen hidden" id="keepsakeScreen" aria-label="Birthday keepsakes">
+			<nav class="top-couple-bar" aria-label="Couple highlight">
+				<div class="couple-brand">
+					<span class="brand-mark">C&amp;S</span>
+					<span class="brand-name">CLA &amp; SHIN</span>
+				</div>
+				<div class="couple-nav" aria-label="Page sections">
+					<a href="#top">Time</a>
+					<a href="#keepsakeScreen">Keepsakes</a>
+					<a href="#accessScreen">Open your surprise</a>
+					<button class="background-picker-button" id="chooseBackgroundButton" type="button">Background photo</button>
+					<button class="background-reset-button hidden" id="removeBackgroundButton" type="button">Remove photo</button>
+					<input class="visually-hidden" id="backgroundPhotoInput" type="file" accept="image/*" aria-label="Choose a background photo">
+				</div>
+			</nav>
 			<header class="site-header">
 				<a class="site-mark" href="#top" aria-label="Birthday keepsakes home"><span>♡</span> for you</a>
 				<button class="back-button" id="backButton" type="button"><span aria-hidden="true">←</span> Back to code</button>
 			</header>
 
-			<section class="together-hero" aria-label="Time together">
+			<section class="couple-name-hero" aria-label="Cla and Shin">
+				<p class="couple-hero-eyebrow">A birthday love letter</p>
+				<h1 class="couple-hero-title"><span>cla</span><span class="couple-hero-divider">/</span><span>shin</span></h1>
+				<p class="couple-hero-caption">A story written in every moment.</p>
+				<a class="couple-hero-link" href="#timeTogether">A little more about us <span aria-hidden="true">↓</span></a>
+			</section>
+
+			<section class="together-hero" id="timeTogether" aria-label="Time together">
 				<p class="together-eyebrow">Our story in numbers</p>
 				<h2 class="together-title" id="togetherTitle">Together for</h2>
 				<p class="together-subline" id="togetherSubline"></p>
@@ -90,13 +111,6 @@
 			</nav>
 
 			<div class="keepsake-content" id="top">
-				<div class="welcome-banner">
-					<span class="welcome-eyebrow">A little collection of us</span>
-					<h1>Happy Birthday, My Love</h1>
-					<p>Keep all your favorite little moments in one place.</p>
-					<span class="banner-flower" aria-hidden="true">✿</span>
-				</div>
-
 				<section class="collection-panel" id="panel-notes" role="tabpanel" aria-labelledby="tab-notes" data-panel="notes">
 					<div class="panel-heading"><div><span class="panel-kicker">A few words from the heart</span><h2>Little love notes</h2></div><button class="add-button" type="button" data-add="noteForm">＋ Add a note</button></div>
 					<form class="entry-form hidden" id="noteForm" data-kind="notes">
